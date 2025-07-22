@@ -117,7 +117,7 @@ def delete_review(request, pk):
     review = Review.objects.get(id=pk) 
     review.delete()
 
-    return Response("Review deleted successfully!", status=204)
+    return Response("Review deleted successfully!", status=200)
 
 @api_view(['DELETE'])
 def delete_cartitem(request, pk):
