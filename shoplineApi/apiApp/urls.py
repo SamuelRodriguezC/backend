@@ -22,6 +22,7 @@ urlpatterns = [
 
     # Newly Added
 
+# Este es un comentario de prueba para hacer pull request
     path("get_orders", views.get_orders, name="get_orders"),
     path("create_user/", views.create_user, name="create_user"),
     path("existing_user/<str:email>", views.existing_user, name="existing_user"),
