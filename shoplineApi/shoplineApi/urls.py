@@ -24,4 +24,5 @@ urlpatterns = [
     path("", include("apiApp.urls"))
 ]
 
+# Dar Accedo a los archivos multimedia desde fuera (front)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

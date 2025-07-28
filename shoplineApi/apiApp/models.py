@@ -3,7 +3,8 @@ from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth.models import AbstractUser
 
-# Create your models here.
+
+# ----------------------- USUARIO ----------------------- 
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     profile_picture_url = models.URLField(blank=True, null=True)
@@ -11,7 +12,7 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.email
     
-
+# ----------------------- CATEGORÍA ----------------------- 
 class Category(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True, blank=True)
@@ -20,12 +21,14 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    # Genera un slug único basado en el nombre antes de guardar la categoría.
     def save(self, *args, **kwargs):
 
         if not self.slug:
-            self.slug = slugify(self.name)
+            self.slug = slugify(self.name) #Convierte el texto en una versión amigable para URLs (reemplazar espacios por guines y todas las letras a minusculas)
             unique_slug = self.slug
             counter = 1
+            # Si ya existe un producto con ese slug 
             if Product.objects.filter(slug=unique_slug).exists():
                 unique_slug = f'{self.slug}-{counter}'
                 counter += 1
@@ -33,7 +36,7 @@ class Category(models.Model):
         
         super().save(*args, **kwargs)
 
-
+# ----------------------- PRODUCTO ----------------------- 
 class Product(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
@@ -48,6 +51,8 @@ class Product(models.Model):
     
     def save(self, *args, **kwargs):
 
+        # Genera automáticamente un slug único basado en el nombre si no existe.
+
         if not self.slug:
             self.slug = slugify(self.name)
             unique_slug = self.slug
@@ -59,7 +64,7 @@ class Product(models.Model):
         
         super().save(*args, **kwargs)
 
-
+# ----------------------- CARRITO -----------------------
 class Cart(models.Model):
     cart_code = models.CharField(max_length=11, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -69,6 +74,7 @@ class Cart(models.Model):
         return self.cart_code
 
 
+# ----------------------- ITEM DEL CARRITO -----------------------
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="cartitems")
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="item")
@@ -79,6 +85,7 @@ class CartItem(models.Model):
     
 
 
+# ----------------------- RESEÑA -----------------------
 class Review(models.Model):
 
     RATING_CHOICES = [
@@ -106,7 +113,7 @@ class Review(models.Model):
         ordering = ["-created"]
 
 
-
+# ----------------------- VALORACIÓN DE PRODUCTO -----------------------
 class ProductRating(models.Model):
     product = models.OneToOneField(Product, on_delete=models.CASCADE, related_name='rating')
     average_rating = models.FloatField(default=0.0)
@@ -117,21 +124,21 @@ class ProductRating(models.Model):
 
 
 
-
+# ----------------------- LISTA DE DESEOS -----------------------
 class Wishlist(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="wishlists")
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="wishlist")
     created = models.DateTimeField(auto_now_add=True) 
 
     class Meta:
-        unique_together = ["user", "product"]
+        unique_together = ["user", "product"]  # No se puede duplicar un mismo producto
 
     def __str__(self):
         return f"{self.user.username} - {self.product.name}"
     
 
 
-
+# ----------------------- ORDEN -----------------------
 class Order(models.Model):
     stripe_checkout_id = models.CharField(max_length=255, unique=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -154,8 +161,7 @@ class OrderItem(models.Model):
     
 
 
-# Newly Added 
-
+# ----------------------- DIRECCIÓN DE CLIENTE -----------------------
 class CustomerAddress(models.Model):
     customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     street = models.CharField(max_length=50, blank=True, null=True)

@@ -139,8 +139,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
+# URL base para acceder a archivos estaticos (CSS, JS, IMAGENES)
 STATIC_URL = 'static/'
+# URL bae para acceder a archivos subidos por los usuarios (fotos de perfil, documentos, etc)
 MEDIA_URL = '/media/'
+# Ruta física en el sistema de archivos donde se almacenan archivos multimedia
 MEDIA_ROOT = BASE_DIR/'media'
 
 
@@ -148,6 +151,8 @@ MEDIA_ROOT = BASE_DIR/'media'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Indica a Django que debe usar un modelo de usuario personalizado en lugar del default
 AUTH_USER_MODEL = "apiApp.CustomUser"
 
 
