@@ -123,8 +123,7 @@ def delete_review(request, pk):
 def delete_cartitem(request, pk):
     cartitem = CartItem.objects.get(id=pk) 
     cartitem.delete()
-
-    return Response("Cartitem deleted successfully!", status=204)
+    return Response({"message": "Cartitem deleted successfully!"}, status=200)
 
 
 
@@ -139,11 +138,11 @@ def add_to_wishlist(request):
     wishlist = Wishlist.objects.filter(user=user, product=product)
     if wishlist:
         wishlist.delete()
-        return Response("Wishlist deleted successfully!", status=204)
+        return Response({"message": "Wishlist deleted successfully", "action": "deleted"}, status=200)
 
     new_wishlist = Wishlist.objects.create(user=user, product=product)
     serializer = WishlistSerializer(new_wishlist)
-    return Response(serializer.data)
+    return Response({"wishlist": serializer.data, "action": "created"}, status=201)
 
 @api_view(['GET'])
 def product_search(request):
