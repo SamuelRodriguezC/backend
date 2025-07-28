@@ -13,72 +13,101 @@ from .serializers import CartItemSerializer, CartSerializer, CategoryDetailSeria
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-# Create your views here.
+
+# Las views son funciones o clases que manejan la lógica de una solicitud HTTP.
+# Reciben una petición del cliente (por ejemplo, desde un navegador o una API) y devuelven una respuesta (HTML, JSON, redirección, etc.).
+
+
+
+
+
+# Variables para pagos en líneas
 stripe.api_key = settings.STRIPE_SECRET_KEY
 endpoint_secret = settings.WEBHOOK_SECRET
 
-
+# Asignar a la variable el modelo de usuario activo en el proyecto (settings.py)
 User = get_user_model()
 
+# -------------------------------------------- LISTA DE PRODUCTOS --------------------------------------------
 @api_view(['GET'])
 def product_list(request):
-    products = Product.objects.filter(featured=True)
-    serializer = ProductListSerializer(products, many=True)
-    return Response(serializer.data)
+    products = Product.objects.filter(featured=True) #Obtener todos los objetos donde el campo featured = True 
+    serializer = ProductListSerializer(products, many=True) #Convertir el resultado de la busqueda anterior en JSON
+    return Response(serializer.data) #Devolver los datos filtrados y serializados
+
+# Ejemplo de la petición desde el front (djago se encarga de pasar el parametro request)
+# const response = await api.get("product_list")
+# return response.data
 
 
+# -------------------------------------------- DETALLES DE PRODUCTO --------------------------------------------
 @api_view(["GET"])
-def product_detail(request, slug):
-    product = Product.objects.get(slug=slug)
-    serializer = ProductDetailSerializer(product)
-    return Response(serializer.data)
+def product_detail(request, slug): # Recibe el request(automático) y el slug (enviado desde el front)
+    product = Product.objects.get(slug=slug) # Obtiene un producto con ese slug 
+    serializer = ProductDetailSerializer(product) # Convierte el producto a JSON
+    return Response(serializer.data) # Devuelve los taddos serializados del producto
+# Ejemplo de la petición desde el front:
+# const response = await api.get(`product_detail/${slug}`)
+# return response.data
 
 
+# -------------------------------------------- LISTA DE CATEGORÍAS --------------------------------------------
 @api_view(["GET"])
 def category_list(request):
-    categories = Category.objects.all()
-    serializer = CategoryListSerializer(categories, many=True)
-    return Response(serializer.data)
+    categories = Category.objects.all() #Obtener todos los objetos de tipo category
+    serializer = CategoryListSerializer(categories, many=True) #Serializar los objetos
+    return Response(serializer.data) # Retornar categorias serializadas
 
+# -------------------------------------------- DETALLES DE CATEGORÍA --------------------------------------------
 @api_view(["GET"])
-def category_detail(request, slug):
-    category = Category.objects.get(slug=slug)
-    serializer = CategoryDetailSerializer(category)
-    return Response(serializer.data)
+def category_detail(request, slug): # Recibir el slug 
+    category = Category.objects.get(slug=slug) # Buscar categoría con el slug
+    serializer = CategoryDetailSerializer(category) #Serializa categoría
+    return Response(serializer.data) #Dvolder detalles de categoria serializado
 
-
+# -------------------------------------------- AÑADIR AL CARRITO --------------------------------------------
 @api_view(["POST"])
 def add_to_cart(request):
+
+    # Extraer los valores enviados en el cuerpo de la solicitud POST (request) desde el front
     cart_code = request.data.get("cart_code")
     product_id = request.data.get("product_id")
 
+    # Busca o crea un carrito con el código proporcionado 
     cart, created = Cart.objects.get_or_create(cart_code=cart_code)
-    product = Product.objects.get(id=product_id)
+    product = Product.objects.get(id=product_id) # Obtiene el producto por el id 
 
-    cartitem, created = CartItem.objects.get_or_create(product=product, cart=cart)
+    # Busca o crea una relación entre el producto y el carrito en la tabla intermedia 
+    cartitem, created = CartItem.objects.get_or_create(product=product, cart=cart) 
+
+    # Establece la cantidad del producto que se va a añadir al carrito = default 1
     cartitem.quantity = 1 
+
+    # Guardar el producto en la base de datos (id, product, quantity, cart)
     cartitem.save() 
 
-    serializer = CartSerializer(cart)
-    return Response(serializer.data)
+    serializer = CartSerializer(cart) # Serializar el carrito
+    return Response(serializer.data) # Devolver el carrito serializado
 
-
+# -------------------------------------------- ACTUALIZAR CANTIDAD DE PRODUCTOS EN EL CARRITO ------------------------------
 @api_view(['PUT'])
 def update_cartitem_quantity(request):
+
+    # Extraer los valores enviados en el cuerpo de la solicitud POST (request) desde el front
     cartitem_id = request.data.get("item_id")
     quantity = request.data.get("quantity")
 
-    quantity = int(quantity)
+    quantity = int(quantity) # Convertir la cantidad a entero
 
-    cartitem = CartItem.objects.get(id=cartitem_id)
-    cartitem.quantity = quantity 
-    cartitem.save()
+    cartitem = CartItem.objects.get(id=cartitem_id) # Obtener el objeto de carrito con el id correspondiente
+    cartitem.quantity = quantity # Setear la cantidad a la cantidad recibida desde el front
+    cartitem.save() # Guardar en la base de datos
 
-    serializer = CartItemSerializer(cartitem)
-    return Response({"data": serializer.data, "message": "Cartitem updated successfully!"})
+    serializer = CartItemSerializer(cartitem) #Serializar el item actualizado
+    return Response({"data": serializer.data, "message": "Cartitem updated successfully!"}) # Devolver respuesta
 
 
-
+# -------------------------------------------- AÑADIR RESEÑA --------------------------------------------
 @api_view(["POST"])
 def add_review(request):
     
@@ -98,6 +127,7 @@ def add_review(request):
     return Response(serializer.data)
 
 
+# -------------------------------------------- ACTUALIZAR RESEÑA --------------------------------------------
 @api_view(['PUT'])
 def update_review(request, pk):
     review = Review.objects.get(id=pk) 
@@ -112,6 +142,7 @@ def update_review(request, pk):
     return Response(serializer.data)
 
 
+# -------------------------------------------- ELIMINAR RESEÑA  --------------------------------------------
 @api_view(['DELETE'])
 def delete_review(request, pk):
     review = Review.objects.get(id=pk) 
@@ -119,6 +150,8 @@ def delete_review(request, pk):
 
     return Response("Review deleted successfully!", status=200)
 
+
+# -------------------------------------------- ELIMINAR PRODUCTO DEL CARRITO --------------------------------------------
 @api_view(['DELETE'])
 def delete_cartitem(request, pk):
     cartitem = CartItem.objects.get(id=pk) 
@@ -126,7 +159,7 @@ def delete_cartitem(request, pk):
     return Response({"message": "Cartitem deleted successfully!"}, status=200)
 
 
-
+# -------------------------------------------- AÑADIR A LISTA DE DESEOS --------------------------------------------
 @api_view(['POST'])
 def add_to_wishlist(request):
     email = request.data.get("email")
@@ -144,6 +177,8 @@ def add_to_wishlist(request):
     serializer = WishlistSerializer(new_wishlist)
     return Response({"wishlist": serializer.data, "action": "created"}, status=201)
 
+
+# -------------------------------------------- BUSCAR PRODUCTOS --------------------------------------------
 @api_view(['GET'])
 def product_search(request):
     query = request.query_params.get("query") 
@@ -159,9 +194,7 @@ def product_search(request):
 
 
 
-
-
-
+# --------------------------------------------  --------------------------------------------
 @api_view(['POST'])
 def create_checkout_session(request):
     cart_code = request.data.get("cart_code")
@@ -278,9 +311,9 @@ def fulfill_checkout(session, cart_code):
 
 
 
-# Newly Added
 
 
+# -------------------------------------------- CREAR USUARIO --------------------------------------------
 @api_view(["POST"])
 def create_user(request):
     username = request.data.get("username")
@@ -295,6 +328,7 @@ def create_user(request):
     return Response(serializer.data)
 
 
+# -------------------------------------------- BUSCAR USUARIO EXISTENTE --------------------------------------------
 @api_view(["GET"])
 def existing_user(request, email):
     try:
@@ -304,6 +338,7 @@ def existing_user(request, email):
         return Response({"exists": False}, status=status.HTTP_404_NOT_FOUND)
 
 
+# -------------------------------------------- OBTENER ORDENES --------------------------------------------
 @api_view(['GET'])
 def get_orders(request):
     email = request.query_params.get("email")
@@ -312,6 +347,7 @@ def get_orders(request):
     return Response(serializer.data)
 
 
+# -------------------------------------------- AÑADIR DIRECCIÓN  --------------------------------------------
 @api_view(["POST"])
 def add_address(request):
     email = request.data.get("email")
@@ -338,6 +374,7 @@ def add_address(request):
     return Response(serializer.data)
 
 
+# --------------------------------------------  --------------------------------------------
 @api_view(["GET"])
 def get_address(request):
     email = request.query_params.get("email") 
@@ -349,6 +386,7 @@ def get_address(request):
     return Response({"error": "Address not found"}, status=200)
 
 
+# -------------------------------------------- LISTA DE DESEOS DE UN USUARIO --------------------------------------------
 @api_view(["GET"])
 def my_wishlists(request):
     email = request.query_params.get("email")
@@ -357,6 +395,7 @@ def my_wishlists(request):
     return Response(serializer.data)
 
 
+# -------------------------------------------- PRODUCTOS DE LA LISTA DE DESEOS --------------------------------------------
 @api_view(["GET"])
 def product_in_wishlist(request):
     email = request.query_params.get("email")
@@ -367,7 +406,7 @@ def product_in_wishlist(request):
     return Response({"product_in_wishlist": False})
 
 
-
+# -------------------------------------------- OBTENER EL CARRITO --------------------------------------------
 @api_view(['GET'])
 def get_cart(request, cart_code):
     cart = Cart.objects.filter(cart_code=cart_code).first()
@@ -379,8 +418,7 @@ def get_cart(request, cart_code):
     return Response({"error": "Cart not found."}, status=status.HTTP_404_NOT_FOUND)
 
 
-
-
+# -------------------------------------------- OBTENER EL STAT DEL CARRITO --------------------------------------------
 @api_view(['GET'])
 def get_cart_stat(request):
     cart_code = request.query_params.get("cart_code")
@@ -392,6 +430,7 @@ def get_cart_stat(request):
     return Response({"error": "Cart not found."}, status=status.HTTP_404_NOT_FOUND)
 
 
+# -------------------------------------------- PRODUCTO EN EL CARRITO --------------------------------------------
 @api_view(['GET'])
 def product_in_cart(request):
     cart_code = request.query_params.get("cart_code")
