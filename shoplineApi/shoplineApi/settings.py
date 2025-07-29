@@ -99,28 +99,28 @@ WSGI_APPLICATION = 'shoplineApi.wsgi.application'
 
 
 # Conexión local a la base de datos
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'shopline',
-#         'USER': 'root',
-#         'PASSWORD': 'unilibre',
-#         'HOST': 'localhost',
-#         'PORT': '3306',
-#     }
-# }
-
-# Cobexión a la base de datos del servidor
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'railway',
+        'NAME': 'shopline',
         'USER': 'root',
-        'PASSWORD': os.getenv("MYSQL_PASSWORD"),
-        'HOST': os.getenv("MYSQL_HOST"), 
-        'PORT': os.getenv("MYSQL_PORT"),
+        'PASSWORD': 'unilibre',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
+
+# Cobexión a la base de datos del servidor
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'railway',
+#         'USER': 'root',
+#         'PASSWORD': os.getenv("MYSQL_PASSWORD"),
+#         'HOST': os.getenv("MYSQL_HOST"), 
+#         'PORT': os.getenv("MYSQL_PORT"),
+#     }
+# }
 
 
 
@@ -164,11 +164,11 @@ STATIC_URL = 'static/'
 
 STATIC_ROOT =   BASE_DIR/'staticfiles'
 
-STORAGES = {
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    }
-}
+# STORAGES = {
+#     "staticfiles": {
+#         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+#     }
+# }
 
 
 # URL bae para acceder a archivos subidos por los usuarios (fotos de perfil, documentos, etc)
