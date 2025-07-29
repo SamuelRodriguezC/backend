@@ -29,7 +29,10 @@ SECRET_KEY = 'django-insecure-#+p5qk00jw&6pt6=rt6u1o)xcz4ng_^!uhcg6ov=@41yu)ic3^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+# ALLOWED_HOSTS = ["localhost", "127.0.0.1", "1afc2ad6c1f2.ngrok-free.app"]
+# CSRF_TRUSTED_ORIGINS = ["https://1afc2ad6c1f2.ngrok-free.app/"] #URL generada por ngrok
+
+ALLOWED_HOSTS = ["*"]
 
 
 # Conexión con el servidor del front
@@ -54,21 +57,22 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ALLOWED_ORIGINS = [
-"http://127.0.0.1:3000",
-"http://localhost:3000",
-"http://localhost:3001",
-"https://next-shop-self.vercel.app"
-]
+# CORS_ALLOWED_ORIGINS = [
+# "http://127.0.0.1:3000",
+# "http://localhost:3000",
+# "http://localhost:3001",
+# "https://next-shop-self.vercel.app"
+# ]
 
 ROOT_URLCONF = 'shoplineApi.urls'
 
@@ -93,16 +97,32 @@ WSGI_APPLICATION = 'shoplineApi.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+
+# Conexión local a la base de datos
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'shopline',
+#         'USER': 'root',
+#         'PASSWORD': 'unilibre',
+#         'HOST': 'localhost',
+#         'PORT': '3306',
+#     }
+# }
+
+# Cobexión a la base de datos del servidor
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'shopline',
+        'NAME': 'railway',
         'USER': 'root',
-        'PASSWORD': 'unilibre',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'PASSWORD': os.getenv("MYSQL_PASSWORD"),
+        'HOST': os.getenv("MYSQL_HOST"), 
+        'PORT': os.getenv("MYSQL_PORT"),
     }
 }
+
+
 
 
 # Password validation
@@ -141,6 +161,16 @@ USE_TZ = True
 
 # URL base para acceder a archivos estaticos (CSS, JS, IMAGENES)
 STATIC_URL = 'static/'
+
+STATIC_ROOT =   BASE_DIR/'staticfiles'
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    }
+}
+
+
 # URL bae para acceder a archivos subidos por los usuarios (fotos de perfil, documentos, etc)
 MEDIA_URL = '/media/'
 # Ruta física en el sistema de archivos donde se almacenan archivos multimedia
@@ -156,6 +186,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "apiApp.CustomUser"
 
 
+# Variables de integración con stripe (Pagos en Línea)
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
 STRIPE_PUBLIC_KEY = os.environ.get("STRIPE_PUBLIC_KEY")
 WEBHOOK_SECRET = os.environ.get("WEBHOOK_SECRET")
