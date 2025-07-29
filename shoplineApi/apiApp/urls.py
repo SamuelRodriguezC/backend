@@ -1,5 +1,7 @@
 from django.urls import path 
 from . import views  
+# conecta las URLs del navegador con las funciones (vistas) de tu aplicación.
+
 
 
 
