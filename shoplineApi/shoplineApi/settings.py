@@ -37,7 +37,8 @@ CSRF_TRUSTED_ORIGINS = ["https://b5f2fae2c2ec.ngrok-free.app"]
 
 # Conexión con el servidor del front
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000"
+    "http://localhost:3000",
+    "http://127.0.0.1:3000"
 ]
 
 
