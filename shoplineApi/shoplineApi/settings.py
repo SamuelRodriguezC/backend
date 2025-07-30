@@ -33,7 +33,7 @@ DEBUG = True
 # CSRF_TRUSTED_ORIGINS = ["https://1afc2ad6c1f2.ngrok-free.app/"] #URL generada por ngrok
 
 ALLOWED_HOSTS = ["*"]
-
+CSRF_TRUSTED_ORIGINS = ["https://b5f2fae2c2ec.ngrok-free.app"]
 
 # Conexión con el servidor del front
 CORS_ALLOWED_ORIGINS = [
@@ -187,6 +187,6 @@ AUTH_USER_MODEL = "apiApp.CustomUser"
 
 
 # Variables de integración con stripe (Pagos en Línea)
-STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
-STRIPE_PUBLIC_KEY = os.environ.get("STRIPE_PUBLIC_KEY")
-WEBHOOK_SECRET = os.environ.get("WEBHOOK_SECRET")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+STRIPE_PUBLIC_KEY = os.getenv("STRIPE_PUBLIC_KEY")
+WEBHOOK_SECRET = os.getenv("WEBHOOK_SECRET")
