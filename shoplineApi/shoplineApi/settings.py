@@ -33,7 +33,7 @@ DEBUG = True
 # CSRF_TRUSTED_ORIGINS = ["https://1afc2ad6c1f2.ngrok-free.app/"] #URL generada por ngrok
 
 ALLOWED_HOSTS = ["*"]
-CSRF_TRUSTED_ORIGINS = ["https://b5f2fae2c2ec.ngrok-free.app"]
+CSRF_TRUSTED_ORIGINS = ["https://https://05e3cd22371b.ngrok-free.app"]
 
 # Conexión con el servidor del front
 CORS_ALLOWED_ORIGINS = [
