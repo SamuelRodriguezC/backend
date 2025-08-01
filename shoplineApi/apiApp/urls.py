@@ -19,12 +19,12 @@ urlpatterns = [
     path("add_to_wishlist/", views.add_to_wishlist, name="add_to_wishlist"),
     path("search", views.product_search, name="search"),
 
+    path("featured_products_limit", views.featured_products_limit, name="featured_products_limit"),
+
     path("create_checkout_session/", views.create_checkout_session, name="create_checkout_session"),
     path("webhook/", views.my_webhook_view, name="webhook"),
 
     # Newly Added
-
-# Este es un comentario de prueba para hacer pull request
     path("get_orders", views.get_orders, name="get_orders"),
     path("create_user/", views.create_user, name="create_user"),
     path("existing_user/<str:email>", views.existing_user, name="existing_user"),
@@ -35,7 +35,6 @@ urlpatterns = [
     path("get_cart/<str:cart_code>", views.get_cart, name="get_cart"),
     path("get_cart_stat", views.get_cart_stat, name="get_cart_stat"),
     path("product_in_cart", views.product_in_cart, name="product_in_cart")
-
 
 
 ]

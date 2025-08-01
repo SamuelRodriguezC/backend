@@ -553,3 +553,22 @@ def product_in_cart(request):
     product_exists_in_cart = CartItem.objects.filter(cart=cart, product=product).exists() #True or False
 
     return Response({'product_in_cart': product_exists_in_cart})
+
+
+
+@api_view(['GET'])
+def featured_products_limit(request):
+    limit = request.GET.get('limit')  # Obtiene el parámetro "limit" de la URL
+
+    products = Product.objects.filter(featured=True)
+
+    # Si el parámetro "limit" fue proporcionado, aplicar límite
+    if limit is not None:
+        try:
+            limit = int(limit)
+            products = products[:limit]
+        except ValueError:
+            pass  # Si no es un entero válido, ignora y devuelve todos
+
+    serializer = ProductListSerializer(products, many=True)
+    return Response(serializer.data)
